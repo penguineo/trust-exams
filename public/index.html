@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exam Platform</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <!-- Add Tailwind CDN for similar styling to the React app -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+  <div id="app">
+    <!-- Auth Form -->
+    <div id="auth-container" class="min-h-screen flex flex-col items-center justify-center p-4">
+      <div class="w-full max-w-md mx-auto">
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="mb-6 text-center">
+            <h1 class="text-2xl font-semibold mb-2">Exam Platform</h1>
+            <p class="text-gray-600">Sign in to access your account</p>
+          </div>
+
+          <div class="mb-4">
+            <div class="tabs flex border-b">
+              <button id="login-tab" class="tab-btn py-2 px-4 border-b-2 border-blue-500 text-blue-500 font-medium">Login</button>
+              <button id="register-tab" class="tab-btn py-2 px-4 text-gray-500 font-medium">Register</button>
+            </div>
+          </div>
+
+          <div class="tab-panels">
+            <!-- Login Form -->
+            <div id="login-panel" class="tab-panel">
+              <form id="login-form" class="space-y-4">
+                <div>
+                  <label for="login-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <input type="email" id="login-email" class="w-full px-4 py-2 border rounded-md" required>
+                </div>
+                <div>
+                  <label for="login-password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                  <input type="password" id="login-password" class="w-full px-4 py-2 border rounded-md" required>
+                </div>
+                <div>
+                  <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">Sign In</button>
+                </div>
+              </form>
+            </div>
+            
+            <!-- Register Form -->
+            <div id="register-panel" class="tab-panel hidden">
+              <div class="mb-4">
+                <div class="user-type-tabs flex border rounded overflow-hidden">
+                  <button id="examiner-type" class="user-type-btn flex-1 py-2 px-4 bg-blue-500 text-white font-medium">Examiner</button>
+                  <button id="student-type" class="user-type-btn flex-1 py-2 px-4 bg-gray-100 text-gray-700 font-medium">Student</button>
+                </div>
+              </div>
+              <form id="register-form" class="space-y-4">
+                <div>
+                  <label for="register-name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                  <input type="text" id="register-name" class="w-full px-4 py-2 border rounded-md" required>
+                </div>
+                <div>
+                  <label for="register-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <input type="email" id="register-email" class="w-full px-4 py-2 border rounded-md" required>
+                </div>
+                <div>
+                  <label for="register-password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                  <input type="password" id="register-password" class="w-full px-4 py-2 border rounded-md" required>
+                </div>
+                <div>
+                  <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">Create Account</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Auth JS -->
+  <script src="/js/auth.js"></script>
+</body>
+</html>
