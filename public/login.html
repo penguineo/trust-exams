@@ -1,0 +1,102 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Trust Exam</title>
+  <meta name="description" content="Log in to your Trust Exam account">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  <link rel="stylesheet" href="../src/index.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+  <!-- Custom tailwind config injection -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', 'San Francisco', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'sans-serif'],
+          },
+          colors: {
+            'trust-blue': '#0077ED',
+            'trust-light-blue': '#E6F2FF',
+            'trust-dark': '#1D1D1F',
+            'trust-gray': '#86868B',
+            'trust-light-gray': '#F5F5F7',
+          },
+        }
+      }
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // Make supabase client accessible globally
+    const supabaseClient = supabase;
+  </script>
+</head>
+<body class="bg-trust-light-gray">
+  <!-- Header -->
+  <header class="fixed top-0 left-0 right-0 z-50 border-b border-gray-100 bg-white/80 backdrop-blur-md navbar-blur">
+    <div class="container-custom flex h-16 items-center justify-between">
+      <div class="flex items-center">
+        <a href="index.html" class="flex items-center space-x-2">
+          <svg class="h-8 w-8 text-trust-blue" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L4 6V12C4 15.31 7.58 20 12 22C16.42 20 20 15.31 20 12V6L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="rgba(0, 119, 237, 0.1)"/>
+            <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="text-xl font-bold text-trust-dark">Trust Exam</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Login Form -->
+  <div class="min-h-screen flex items-center justify-center px-4 py-24">
+    <div class="w-full max-w-md">
+      <div class="card animate-fade-in bg-white p-8 shadow-md">
+        <div class="text-center mb-8">
+          <h1 class="text-2xl font-bold mb-2">Welcome back</h1>
+          <p class="text-trust-gray">Log in to your Trust Exam account</p>
+        </div>
+
+        <div id="login-error" class="hidden mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm"></div>
+        
+        <form id="login-form" class="space-y-6">
+          <div>
+            <label for="email" class="block text-sm font-medium text-trust-dark mb-1">Email address</label>
+            <input id="email" type="email" required class="input w-full" placeholder="Enter your email">
+          </div>
+          
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label for="password" class="block text-sm font-medium text-trust-dark">Password</label>
+              <a href="#" class="text-xs text-trust-blue hover:underline">Forgot password?</a>
+            </div>
+            <input id="password" type="password" required class="input w-full" placeholder="Enter your password">
+          </div>
+
+          <button type="submit" class="btn btn-primary w-full">
+            Log in
+          </button>
+        </form>
+
+        <div class="mt-8 pt-6 border-t border-gray-100 text-center">
+          <p class="text-sm text-trust-gray">
+            Don't have an account? <a href="signup.html" class="text-trust-blue hover:underline">Sign up</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      initLogin();
+      feather.replace();
+    });
+  </script>
+</body>
+</html>
