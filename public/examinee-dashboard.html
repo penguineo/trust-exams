@@ -1,0 +1,468 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Examinee Dashboard - Trust Exam</title>
+  <meta name="description" content="View your upcoming exams and results">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  <link rel="stylesheet" href="../src/index.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+  <!-- Custom tailwind config injection -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', 'San Francisco', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'sans-serif'],
+          },
+          colors: {
+            'trust-blue': '#0077ED',
+            'trust-light-blue': '#E6F2FF',
+            'trust-dark': '#1D1D1F',
+            'trust-gray': '#86868B',
+            'trust-light-gray': '#F5F5F7',
+          },
+        }
+      }
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-trust-light-gray">
+  <!-- Sidebar -->
+  <aside class="fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 hidden md:block">
+    <div class="flex flex-col h-full">
+      <div class="flex items-center h-16 px-6 border-b border-gray-200">
+        <a href="examinee-dashboard.html" class="flex items-center space-x-2">
+          <svg class="h-8 w-8 text-trust-blue" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L4 6V12C4 15.31 7.58 20 12 22C16.42 20 20 15.31 20 12V6L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="rgba(0, 119, 237, 0.1)"/>
+            <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="text-xl font-bold text-trust-dark">Trust Exam</span>
+        </a>
+      </div>
+      
+      <nav class="flex-1 overflow-y-auto py-4 px-3">
+        <ul class="space-y-1">
+          <li>
+            <a href="examinee-dashboard.html" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg bg-trust-light-blue text-trust-blue">
+              <i data-feather="home" class="h-5 w-5 mr-2"></i>
+              Dashboard
+            </a>
+          </li>
+          <li>
+            <a href="currently_underworking.html" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg text-trust-gray hover:bg-trust-light-gray hover:text-trust-dark">
+              <i data-feather="calendar" class="h-5 w-5 mr-2"></i>
+              Upcoming Exams
+            </a>
+          </li>
+          <li>
+            <a href="currently_underworking.html" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg text-trust-gray hover:bg-trust-light-gray hover:text-trust-dark">
+              <i data-feather="check-square" class="h-5 w-5 mr-2"></i>
+              Completed Exams
+            </a>
+          </li>
+          <li>
+            <a href="currently_underworking.html" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg text-trust-gray hover:bg-trust-light-gray hover:text-trust-dark">
+              <i data-feather="award" class="h-5 w-5 mr-2"></i>
+              Results
+            </a>
+          </li>
+          <li>
+            <a href="currently_underworking.html" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg text-trust-gray hover:bg-trust-light-gray hover:text-trust-dark">
+              <i data-feather="settings" class="h-5 w-5 mr-2"></i>
+              Profile Settings
+            </a>
+          </li>
+        </ul>
+      </nav>
+      
+      <div class="p-4 border-t border-gray-200">
+        <button id="logout-button" class="flex items-center text-trust-gray hover:text-trust-dark">
+          <i data-feather="log-out" class="h-5 w-5 mr-2"></i>
+          <span>Log out</span>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Mobile Header -->
+  <header class="md:hidden flex items-center justify-between h-16 px-4 border-b border-gray-200 bg-white">
+    <button id="mobile-menu-button" class="p-2 rounded-lg text-trust-gray">
+      <i data-feather="menu" class="h-6 w-6"></i>
+    </button>
+    
+    <a href="examinee-dashboard.html" class="flex items-center space-x-2">
+      <svg class="h-8 w-8 text-trust-blue" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L4 6V12C4 15.31 7.58 20 12 22C16.42 20 20 15.31 20 12V6L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="rgba(0, 119, 237, 0.1)"/>
+        <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="text-xl font-bold text-trust-dark">Trust Exam</span>
+    </a>
+    
+    <div class="w-10"></div> <!-- Empty div for spacing -->
+  </header>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="fixed inset-0 z-50 bg-black bg-opacity-50 hidden md:hidden">
+    <div class="absolute inset-y-0 left-0 w-64 bg-white shadow-lg transform transition-transform duration-300 translate-x-0">
+      <div class="flex items-center justify-between h-16 px-6 border-b border-gray-200">
+        <a href="examinee-dashboard.html" class="flex items-center space-x-2">
+          <svg class="h-8 w-8 text-trust-blue" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L4 6V12C4 15.31 7.58 20 12 22C16.42 20 20 15.31 20 12V6L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="rgba(0, 119, 237, 0.1)"/>
+            <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="text-xl font-bold text-trust-dark">Trust Exam</span>
+        </a>
+        
+        <button id="close-mobile-menu" class="p-2 rounded-lg text-trust-gray">
+          <i data-feather="x" class="h-6 w-6"></i>
+        </button>
+      </div>
+      
+      <nav class="overflow-y-auto py-4 px-3">
+        <ul class="space-y-1">
+          <li>
+            <a href="examinee-dashboard.html" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg bg-trust-light-blue text-trust-blue">
+              <i data-feather="home" class="h-5 w-5 mr-2"></i>
+              Dashboard
+            </a>
+          </li>
+          <li>
+            <a href="currently_underworking.html" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg text-trust-gray hover:bg-trust-light-gray hover:text-trust-dark">
+              <i data-feather="calendar" class="h-5 w-5 mr-2"></i>
+              Upcoming Exams
+            </a>
+          </li>
+          <li>
+            <a href="currently_underworking.html" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg text-trust-gray hover:bg-trust-light-gray hover:text-trust-dark">
+              <i data-feather="check-square" class="h-5 w-5 mr-2"></i>
+              Completed Exams
+            </a>
+          </li>
+          <li>
+            <a href="currently_underworking.html" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg text-trust-gray hover:bg-trust-light-gray hover:text-trust-dark">
+              <i data-feather="award" class="h-5 w-5 mr-2"></i>
+              Results
+            </a>
+          </li>
+          <li>
+            <a href="currently_underworking.html" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg text-trust-gray hover:bg-trust-light-gray hover:text-trust-dark">
+              <i data-feather="settings" class="h-5 w-5 mr-2"></i>
+              Profile Settings
+            </a>
+          </li>
+        </ul>
+      </nav>
+      
+      <div class="p-4 border-t border-gray-200">
+        <button id="mobile-logout-button" class="flex items-center text-trust-gray hover:text-trust-dark">
+          <i data-feather="log-out" class="h-5 w-5 mr-2"></i>
+          <span>Log out</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="md:ml-64 min-h-screen pb-10">
+    <div class="container-custom py-8">
+      <!-- Welcome Section -->
+      <div class="mb-8">
+        <span class="inline-block px-3 py-1 text-xs font-medium rounded-full bg-trust-blue/10 text-trust-blue mb-4">Examinee Dashboard</span>
+        <h1 class="text-3xl font-bold mb-2">Welcome, <span id="examinee-name">Examinee</span></h1>
+        <p class="text-trust-gray">View your upcoming exams and results</p>
+      </div>
+      
+      <!-- Quick Stats -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="card bg-white p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-trust-gray text-sm font-medium">Upcoming Exams</h3>
+            <div class="bg-blue-100 text-trust-blue rounded-full w-10 h-10 flex items-center justify-center">
+              <i data-feather="calendar" class="h-5 w-5"></i>
+            </div>
+          </div>
+          <p class="text-3xl font-bold">2</p>
+          <p class="text-trust-gray text-sm mt-1">Scheduled for next week</p>
+        </div>
+        
+        <div class="card bg-white p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-trust-gray text-sm font-medium">Completed Exams</h3>
+            <div class="bg-green-100 text-green-800 rounded-full w-10 h-10 flex items-center justify-center">
+              <i data-feather="check-square" class="h-5 w-5"></i>
+            </div>
+          </div>
+          <p class="text-3xl font-bold">8</p>
+          <p class="text-trust-gray text-sm mt-1">Successfully completed</p>
+        </div>
+        
+        <div class="card bg-white p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-trust-gray text-sm font-medium">Average Score</h3>
+            <div class="bg-purple-100 text-purple-800 rounded-full w-10 h-10 flex items-center justify-center">
+              <i data-feather="award" class="h-5 w-5"></i>
+            </div>
+          </div>
+          <p class="text-3xl font-bold">85%</p>
+          <p class="text-trust-gray text-sm mt-1">Across all exams</p>
+        </div>
+      </div>
+      
+      <!-- Upcoming Exams -->
+      <div class="mb-8">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-xl font-bold">Upcoming Exams</h2>
+          <a href="currently_underworking.html" class="text-sm text-trust-blue hover:underline flex items-center">
+            View all
+            <i data-feather="chevron-right" class="h-4 w-4 ml-1"></i>
+          </a>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="card bg-white relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-2 h-full bg-red-500"></div>
+            <div class="p-6">
+              <div class="flex justify-between items-start mb-4">
+                <div>
+                  <span class="text-sm font-medium text-red-500">Upcoming Soon</span>
+                  <h3 class="text-lg font-semibold mt-1">Introduction to Biology - Midterm</h3>
+                  <p class="text-trust-gray text-sm">MID101 - Dr. Johnson</p>
+                </div>
+                <div class="bg-red-100 text-red-800 rounded-full px-3 py-1 text-xs font-medium">
+                  Today, 2:00 PM
+                </div>
+              </div>
+              
+              <div class="flex items-center text-sm text-trust-gray mb-4">
+                <i data-feather="clock" class="h-4 w-4 mr-2"></i>
+                <span>Duration: 1 hour 30 minutes</span>
+              </div>
+              
+              <div class="flex items-center justify-between mt-4">
+                <button class="btn btn-primary text-sm py-2">
+                  Start Exam
+                </button>
+                <button class="text-trust-gray hover:text-trust-dark text-sm flex items-center">
+                  <i data-feather="info" class="h-4 w-4 mr-1"></i>
+                  Details
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card bg-white relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-2 h-full bg-trust-blue"></div>
+            <div class="p-6">
+              <div class="flex justify-between items-start mb-4">
+                <div>
+                  <span class="text-sm font-medium text-trust-blue">Upcoming</span>
+                  <h3 class="text-lg font-semibold mt-1">Chemistry Fundamentals - Quiz 3</h3>
+                  <p class="text-trust-gray text-sm">CHEM202 - Dr. Smith</p>
+                </div>
+                <div class="bg-trust-light-blue text-trust-blue rounded-full px-3 py-1 text-xs font-medium">
+                  May 20, 10:00 AM
+                </div>
+              </div>
+              
+              <div class="flex items-center text-sm text-trust-gray mb-4">
+                <i data-feather="clock" class="h-4 w-4 mr-2"></i>
+                <span>Duration: 45 minutes</span>
+              </div>
+              
+              <div class="flex items-center justify-between mt-4">
+                <button class="btn btn-secondary text-sm py-2" disabled>
+                  Not Available Yet
+                </button>
+                <button class="text-trust-gray hover:text-trust-dark text-sm flex items-center">
+                  <i data-feather="info" class="h-4 w-4 mr-1"></i>
+                  Details
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Recent Results -->
+      <div class="mb-8">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-xl font-bold">Recent Results</h2>
+          <a href="currently_underworking.html" class="text-sm text-trust-blue hover:underline flex items-center">
+            View all
+            <i data-feather="chevron-right" class="h-4 w-4 ml-1"></i>
+          </a>
+        </div>
+        
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="text-left border-b border-gray-200">
+                <th class="pb-3 pl-6 pr-3 font-medium text-trust-gray text-sm">Exam Title</th>
+                <th class="pb-3 px-3 font-medium text-trust-gray text-sm">Date</th>
+                <th class="pb-3 px-3 font-medium text-trust-gray text-sm">Score</th>
+                <th class="pb-3 px-3 font-medium text-trust-gray text-sm">Grade</th>
+                <th class="pb-3 px-3 font-medium text-trust-gray text-sm">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-b border-gray-100 hover:bg-gray-50">
+                <td class="py-4 pl-6 pr-3">
+                  <div class="font-medium text-trust-dark">Physics 101 - Quiz 1</div>
+                  <div class="text-trust-gray text-sm">PHY101 - Dr. Davis</div>
+                </td>
+                <td class="py-4 px-3 text-trust-gray">May 10, 2023</td>
+                <td class="py-4 px-3 text-trust-dark">92%</td>
+                <td class="py-4 px-3">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    A
+                  </span>
+                </td>
+                <td class="py-4 px-3">
+                  <button class="text-trust-blue hover:underline text-sm">
+                    View Details
+                  </button>
+                </td>
+              </tr>
+              <tr class="border-b border-gray-100 hover:bg-gray-50">
+                <td class="py-4 pl-6 pr-3">
+                  <div class="font-medium text-trust-dark">Calculus II - Midterm</div>
+                  <div class="text-trust-gray text-sm">MATH202 - Dr. Wilson</div>
+                </td>
+                <td class="py-4 px-3 text-trust-gray">May 5, 2023</td>
+                <td class="py-4 px-3 text-trust-dark">78%</td>
+                <td class="py-4 px-3">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    B
+                  </span>
+                </td>
+                <td class="py-4 px-3">
+                  <button class="text-trust-blue hover:underline text-sm">
+                    View Details
+                  </button>
+                </td>
+              </tr>
+              <tr class="hover:bg-gray-50">
+                <td class="py-4 pl-6 pr-3">
+                  <div class="font-medium text-trust-dark">Computer Science - Programming Quiz</div>
+                  <div class="text-trust-gray text-sm">CS101 - Dr. Thompson</div>
+                </td>
+                <td class="py-4 px-3 text-trust-gray">May 1, 2023</td>
+                <td class="py-4 px-3 text-trust-dark">85%</td>
+                <td class="py-4 px-3">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    B+
+                  </span>
+                </td>
+                <td class="py-4 px-3">
+                  <button class="text-trust-blue hover:underline text-sm">
+                    View Details
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- System Requirements -->
+      <div class="card bg-white p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-bold">System Requirements Check</h2>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            All Passed
+          </span>
+        </div>
+        
+        <p class="text-trust-gray mb-4">Your system meets all the requirements for taking secure exams.</p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="flex items-center">
+            <div class="w-8 h-8 rounded-full bg-green-100 text-green-800 flex items-center justify-center mr-3">
+              <i data-feather="check" class="h-4 w-4"></i>
+            </div>
+            <div>
+              <p class="font-medium text-trust-dark">Browser</p>
+              <p class="text-sm text-trust-gray">Chrome 90+</p>
+            </div>
+          </div>
+          
+          <div class="flex items-center">
+            <div class="w-8 h-8 rounded-full bg-green-100 text-green-800 flex items-center justify-center mr-3">
+              <i data-feather="check" class="h-4 w-4"></i>
+            </div>
+            <div>
+              <p class="font-medium text-trust-dark">Camera</p>
+              <p class="text-sm text-trust-gray">Working properly</p>
+            </div>
+          </div>
+          
+          <div class="flex items-center">
+            <div class="w-8 h-8 rounded-full bg-green-100 text-green-800 flex items-center justify-center mr-3">
+              <i data-feather="check" class="h-4 w-4"></i>
+            </div>
+            <div>
+              <p class="font-medium text-trust-dark">Microphone</p>
+              <p class="text-sm text-trust-gray">Working properly</p>
+            </div>
+          </div>
+          
+          <div class="flex items-center">
+            <div class="w-8 h-8 rounded-full bg-green-100 text-green-800 flex items-center justify-center mr-3">
+              <i data-feather="check" class="h-4 w-4"></i>
+            </div>
+            <div>
+              <p class="font-medium text-trust-dark">Internet Speed</p>
+              <p class="text-sm text-trust-gray">15 Mbps (Good)</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Scripts -->
+  <script src="../js/auth.js"></script>
+  <script src="../js/examinee.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      checkAuth('examinee');
+      initExamineeDashboard();
+      feather.replace();
+      
+      // Mobile menu toggle
+      const mobileMenuButton = document.getElementById('mobile-menu-button');
+      const closeMobileMenuButton = document.getElementById('close-mobile-menu');
+      const mobileMenu = document.getElementById('mobile-menu');
+      
+      mobileMenuButton.addEventListener('click', function() {
+        mobileMenu.classList.remove('hidden');
+      });
+      
+      closeMobileMenuButton.addEventListener('click', function() {
+        mobileMenu.classList.add('hidden');
+      });
+      
+      // Close menu when clicking outside
+      mobileMenu.addEventListener('click', function(e) {
+        if (e.target === mobileMenu) {
+          mobileMenu.classList.add('hidden');
+        }
+      });
+      
+      // Logout
+      document.getElementById('logout-button').addEventListener('click', function() {
+        logoutUser();
+      });
+      
+      document.getElementById('mobile-logout-button').addEventListener('click', function() {
+        logoutUser();
+      });
+    });
+  </script>
+</body>
+</html>
