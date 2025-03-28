@@ -20,5 +20,10 @@ jobs:
       - uses: supabase/setup-cli@v1
         with:
           version: latest
+      - run: |
+        echo "SUPABASE_ACCESS_TOKEN: $SUPABASE_ACCESS_TOKEN"
+        echo "PROJECT_ID: $PROJECT_ID"
+        echo "Working directory: $(pwd)"
+
 
       - run: supabase functions deploy --project-ref $PROJECT_ID --workdir "./supabase"
